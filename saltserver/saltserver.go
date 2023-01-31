@@ -24,7 +24,7 @@ import (
 	"log"
 
 	pb "github.com/dvaumoron/puzzlesaltservice"
-	"github.com/go-redis/redis/v8"
+	"github.com/redis/go-redis/v9"
 )
 
 const redisCallMsg = "Failed during Redis call :"
