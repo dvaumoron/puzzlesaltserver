@@ -1,2 +1,3 @@
 # puzzlesaltserver
-A simple implementation of a puzzlesaltservice server calling Redis.
+
+A simple implementation of a [puzzlesaltservice](https://github.com/dvaumoron/puzzlesaltservice) server calling [Redis](https://redis.io/).
