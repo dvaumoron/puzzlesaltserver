@@ -19,38 +19,27 @@ package main
 
 import (
 	"log"
-	"net"
 	"os"
 	"strconv"
 
+	grpcserver "github.com/dvaumoron/puzzlegrpcserver"
 	redisclient "github.com/dvaumoron/puzzleredisclient"
 	"github.com/dvaumoron/puzzlesaltserver/saltserver"
 	pb "github.com/dvaumoron/puzzlesaltservice"
-	"github.com/joho/godotenv"
-	"google.golang.org/grpc"
 )
 
 func main() {
-	if godotenv.Overload() == nil {
-		log.Println("Loaded .env file")
-	}
+	// should start with this, to benefit from the call to godotenv
+	s := grpcserver.New()
 
 	saltLen, err := strconv.Atoi(os.Getenv("SALT_LENGTH"))
 	if err != nil {
 		log.Fatal("Failed to parse SALT_LENGTH")
 	}
 
-	lis, err := net.Listen("tcp", ":"+os.Getenv("SERVICE_PORT"))
-	if err != nil {
-		log.Fatal("Failed to listen :", err)
-	}
-
 	rdb := redisclient.Create()
 
-	s := grpc.NewServer()
 	pb.RegisterSaltServer(s, saltserver.New(rdb, saltLen))
-	log.Println("Listening at", lis.Addr())
-	if err := s.Serve(lis); err != nil {
-		log.Fatal("Failed to serve :", err)
-	}
+
+	s.Start()
 }
