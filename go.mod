@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/dvaumoron/puzzlegrpcserver v1.0.1
 	github.com/dvaumoron/puzzleredisclient v1.0.1
-	github.com/dvaumoron/puzzlesaltservice v1.0.0
+	github.com/dvaumoron/puzzlesaltservice v1.0.1
 	github.com/redis/go-redis/v9 v9.0.1
 )
 

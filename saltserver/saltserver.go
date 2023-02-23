@@ -47,7 +47,7 @@ func (s server) LoadOrGenerate(ctx context.Context, request *pb.Request) (*pb.Re
 	login := request.Login
 	salt, err := s.rdb.Get(ctx, login).Result()
 	if err == nil {
-		return &pb.Response{Salt: salt}, nil
+		return &pb.Response{Salt: []byte(salt)}, nil
 	}
 	if err != redis.Nil {
 		log.Println(redisCallMsg, err)
@@ -65,5 +65,5 @@ func (s server) LoadOrGenerate(ctx context.Context, request *pb.Request) (*pb.Re
 		log.Println(redisCallMsg, err)
 		return nil, errInternal
 	}
-	return &pb.Response{Salt: salt}, nil
+	return &pb.Response{Salt: saltBuffer}, nil
 }
