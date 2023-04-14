@@ -34,7 +34,7 @@ func main() {
 
 	saltLen, err := strconv.Atoi(os.Getenv("SALT_LENGTH"))
 	if err != nil {
-		log.Fatal("Failed to parse SALT_LENGTH")
+		log.Fatalln("Failed to parse SALT_LENGTH")
 	}
 
 	rdb := redisclient.Create()
