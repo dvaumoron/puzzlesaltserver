@@ -21,26 +21,27 @@ import (
 	"context"
 	"crypto/rand"
 	"errors"
-	"log"
 
 	pb "github.com/dvaumoron/puzzlesaltservice"
 	"github.com/redis/go-redis/v9"
+	"go.uber.org/zap"
 )
 
-const redisCallMsg = "Failed during Redis call :"
-const generateMsg = "Failed to generate :"
+const redisCallMsg = "Failed during Redis call"
+const generateMsg = "Failed to generate"
 
 var errInternal = errors.New("internal service error")
 
 // server is used to implement puzzlesaltservice.SaltServer
 type server struct {
 	pb.UnimplementedSaltServer
-	rdb *redis.Client
-	len int
+	rdb    *redis.Client
+	len    int
+	logger *zap.Logger
 }
 
-func New(rdb *redis.Client, saltLen int) pb.SaltServer {
-	return server{rdb: rdb, len: saltLen}
+func New(rdb *redis.Client, saltLen int, logger *zap.Logger) pb.SaltServer {
+	return server{rdb: rdb, len: saltLen, logger: logger}
 }
 
 func (s server) LoadOrGenerate(ctx context.Context, request *pb.Request) (*pb.Response, error) {
@@ -50,19 +51,19 @@ func (s server) LoadOrGenerate(ctx context.Context, request *pb.Request) (*pb.Re
 		return &pb.Response{Salt: []byte(salt)}, nil
 	}
 	if err != redis.Nil {
-		log.Println(redisCallMsg, err)
+		s.logger.Error(redisCallMsg, zap.Error(err))
 		return nil, errInternal
 	}
 
 	saltBuffer := make([]byte, s.len)
 	_, err = rand.Read(saltBuffer)
 	if err != nil {
-		log.Println(generateMsg, err)
+		s.logger.Error(generateMsg, zap.Error(err))
 		return nil, errInternal
 	}
 	salt = string(saltBuffer)
 	if err = s.rdb.Set(ctx, login, salt, 0).Err(); err != nil {
-		log.Println(redisCallMsg, err)
+		s.logger.Error(redisCallMsg, zap.Error(err))
 		return nil, errInternal
 	}
 	return &pb.Response{Salt: saltBuffer}, nil

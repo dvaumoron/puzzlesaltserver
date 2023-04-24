@@ -18,7 +18,6 @@
 package main
 
 import (
-	"log"
 	"os"
 	"strconv"
 
@@ -30,16 +29,16 @@ import (
 
 func main() {
 	// should start with this, to benefit from the call to godotenv
-	s := grpcserver.New()
+	s := grpcserver.Make()
 
 	saltLen, err := strconv.Atoi(os.Getenv("SALT_LENGTH"))
 	if err != nil {
-		log.Fatalln("Failed to parse SALT_LENGTH")
+		s.Logger.Fatal("Failed to parse SALT_LENGTH")
 	}
 
-	rdb := redisclient.Create()
+	rdb := redisclient.Create(s.Logger)
 
-	pb.RegisterSaltServer(s, saltserver.New(rdb, saltLen))
+	pb.RegisterSaltServer(s, saltserver.New(rdb, saltLen, s.Logger))
 
 	s.Start()
 }
