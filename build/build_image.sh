@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-go install
+./build/build.sh
 
 buildah from --name puzzlesaltserver-working-container scratch
 buildah copy puzzlesaltserver-working-container $HOME/go/bin/puzzlesaltserver /bin/puzzlesaltserver

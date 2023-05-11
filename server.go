@@ -18,6 +18,7 @@
 package main
 
 import (
+	_ "embed"
 	"os"
 	"strconv"
 
@@ -27,9 +28,12 @@ import (
 	pb "github.com/dvaumoron/puzzlesaltservice"
 )
 
+//go:embed version.txt
+var version string
+
 func main() {
 	// should start with this, to benefit from the call to godotenv
-	s := grpcserver.Make()
+	s := grpcserver.Make(saltserver.SaltKey, version)
 
 	saltLen, err := strconv.Atoi(os.Getenv("SALT_LENGTH"))
 	if err != nil {
